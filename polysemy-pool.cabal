@@ -1,0 +1,25 @@
+cabal-version:      3.0
+name:               polysemy-pool
+version:            0.1
+synopsis:           Resource pool effect for polysemy
+license:            MIT
+license-file:       LICENSE
+author:             Lana Black
+maintainer:         lana@illuminati.industries
+category:           Control, Pool, Effects, Polysemy
+build-type:         Simple
+
+common warnings
+    ghc-options: -Wall
+
+library
+    import:           warnings
+    exposed-modules:  Polysemy.Pool
+    other-modules:    Control.Concurrent.Sem
+                      Polysemy.Pool.Effect
+                      Polysemy.Pool.IO
+    build-depends:    base >=4.14 && < 5.0,
+                      polysemy >= 1.6 && < 2.0,
+                      stm
+    hs-source-dirs:   src
+    default-language: Haskell2010

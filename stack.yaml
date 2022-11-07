@@ -1,0 +1,8 @@
+#resolver: nightly-2022-11-4
+resolver: lts-19.31
+
+packages:
+- .
+
+extra-deps:
+- SafeSemaphore-0.10.1
