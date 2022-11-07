@@ -13,7 +13,7 @@ import Polysemy.Internal.CustomErrors
 import Polysemy.Resource
 import Polysemy.Pool.Effect
 
-runPoolIO :: (Members '[Embed IO] r, Eq t)
+runPoolIO :: Members '[Embed IO] r
           => Sem r t
           -> (t -> Sem r ())
           -> Word
