@@ -1,0 +1,66 @@
+#+TITLE: Read me
+
+* What is this?
+
+polysemy-pool is a small library implementing a resource pool effect to be used with polysemy.
+
+* How do I use this?
+
+Here's a short example:
+
+#+BEGIN_SRC Haskell
+foo = do
+  res <- acquire
+  bar res
+  release res
+#+END_SRC Haskell
+
+Since a pool has usually a limited amount of resources, 'acquireMaybe' can be used to avoid stalling:
+
+#+BEGIN_SRC Haskell
+foo = do
+  mres <- acquireMaybe
+  case mres of
+    Just res -> bar res >> release res
+    Nothing -> embed (putStrLn "Ooops! We ran out of resources!")
+#+END_SRC Haskell
+
+The two examples above are useful, but are prone to bugs if your code isn't pure and may run into exceptions.
+In this case, the right course of action would be to use 'withResourceIO' or 'withResourceFinalIO':
+
+#+BEGIN_SRC Haskell
+foo = withResourceIO $ \res ->
+  embed $ putStrLn "Bzzz bzzzz"
+  bar res
+  embed $ putStrLn "All done!"
+#+END_SRC Haskell
+
+Or...
+
+#+BEGIN_SRC Haskell
+foo = withResourceFinalIO $ \res ->
+  embedFinal $ putStrLn "Bzzz bzzzz"
+  bar res
+  embedFinal $ putStrLn "All done!"
+#+END_SRC Haskell
+
+These functions are implemented in terms of 'Resource' effect from Polysemy.
+
+Available interpreters for 'Pool t' effect:
++ runPurePool :: Member (Error PoolExhausted) r => [t] -> Sem (Pool t ': r) a -> Sem r a
+  Takes a pre-made list of resources, throws an exception on exhaustion. You probably shouldn't use this for anything serious, it is only provided for reference.
++ runPoolIO :: (Members '[Embed IO] r, Eq t)
+            => Sem r t
+            -> (t -> Sem r ())
+            -> Word
+            -> Sem (Pool t ': r) a
+            -> Sem r a
+  Takes an action to create a resource, an action to destroy it, and a number of resources to be created. If not sure, use this one.
++ runPoolFinalIO :: (Members '[Final IO] r, Eq t)
+                 => Sem r t
+                 -> (t -> Sem r ())
+                 -> Word
+                 -> Sem (Pool t ': r) a
+                 -> Sem r a
+  Same as above, but works with 'Final IO' and thus is more strict with regards to exceptions and inner effects. Note that stateful effects (such as 'State') may not be able to pass their state from the code inside this interpreter into the outside environment.
+
