@@ -15,8 +15,7 @@ common warnings
 library
     import:           warnings
     exposed-modules:  Polysemy.Pool
-    other-modules:    Control.Concurrent.Sem
-                      Polysemy.Pool.Effect
+    other-modules:    Polysemy.Pool.Effect
                       Polysemy.Pool.IO
     build-depends:    base >=4.14 && < 5.0,
                       polysemy >= 1.6 && < 2.0,
