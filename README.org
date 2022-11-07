@@ -45,22 +45,3 @@ foo = withResourceFinalIO $ \res ->
 #+END_SRC Haskell
 
 These functions are implemented in terms of 'Resource' effect from Polysemy.
-
-Available interpreters for 'Pool t' effect:
-+ runPurePool :: Member (Error PoolExhausted) r => [t] -> Sem (Pool t ': r) a -> Sem r a
-  Takes a pre-made list of resources, throws an exception on exhaustion. You probably shouldn't use this for anything serious, it is only provided for reference.
-+ runPoolIO :: (Members '[Embed IO] r, Eq t)
-            => Sem r t
-            -> (t -> Sem r ())
-            -> Word
-            -> Sem (Pool t ': r) a
-            -> Sem r a
-  Takes an action to create a resource, an action to destroy it, and a number of resources to be created. If not sure, use this one.
-+ runPoolFinalIO :: (Members '[Final IO] r, Eq t)
-                 => Sem r t
-                 -> (t -> Sem r ())
-                 -> Word
-                 -> Sem (Pool t ': r) a
-                 -> Sem r a
-  Same as above, but works with 'Final IO' and thus is more strict with regards to exceptions and inner effects. Note that stateful effects (such as 'State') may not be able to pass their state from the code inside this interpreter into the outside environment.
-
